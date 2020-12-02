@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("express-jwt");
 const cors = require("cors");
 const config = require("../config");
 const routes = require("../api");
@@ -13,6 +14,12 @@ module.exports = ({ app, HttpLogger: logger }) => {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+  app.use(
+    jwt({
+      algorithms: config.jwt.algorithms,
+      secret: config.jwt.secret,
+    }).unless(config.jwt.exclude)
+  );
 
   //---------------------------
   // LOAD/MOUNT API ROUTES
@@ -28,6 +35,20 @@ module.exports = ({ app, HttpLogger: logger }) => {
     const err = new Error("Not Found");
     err.status = 404;
     next(err);
+  });
+
+  // ultimate error handler
+  app.use((err, req, res, next) => {
+    if( err.name === "UnauthorizedError"){
+      err.status = 401;
+      err.message = "Not authorized (invalid token)";
+    }
+    
+    res.status(err.status || 500).json({
+      error: {
+        message: err.message || "Internal Server Error",
+      },
+    });
   });
 
   // ultimate error handler
