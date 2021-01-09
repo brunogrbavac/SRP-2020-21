@@ -12,3 +12,4 @@ exports.medicalTestServiceInstance = new MedicalTestService({
   logger,
   testModel: MedicalTest,
 });
+/*proba*/
