@@ -62,9 +62,15 @@ const MedicalTest_5 = subject("MedicalTest", {
 // * =============================
 // *  Roles <--> permissions
 // * -----------------------------
-function defineAdminRules({ can }, user) {}
+function defineAdminRules({ can }, user) {
+  can('manage','all');
+}
 function defineDoctorRules({ can }, user) {}
-function defineUserRules({ can }, user) {}
+function defineUserRules({ can }, user) {
+  can(['read','create','update','delete'],'MedicalTest', {
+    UserId: user.id
+  });
+}
 function defineAnonymousRules({ can }, user) {}
 
 // * =============================
